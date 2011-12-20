@@ -1,0 +1,7 @@
+core = "7.x"
+dependencies[] = "ding_user_frontend"
+description = "Extra user pages modifications for Artesis"
+name = "Artesis user frontend"
+package = "Artesis"
+php = "5.2.4"
+version = "7.x-0.1"

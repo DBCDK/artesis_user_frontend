@@ -1,0 +1,51 @@
+<?php
+/**
+ * Artesis user frontend.
+ */
+
+/**
+ * Implements hook_profile2_type_load().
+ *
+ * Hide the profile tab on the user edit page.
+ */
+function artesis_user_frontend_profile2_type_load($types) {
+  foreach ($types as $name => $type) {
+    if (preg_match('/^provider_/', $name)) {
+      $type->userCategory = FALSE;
+      /* $type->userView = FALSE; */
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_form_alter().
+ *
+ * Adds profile2 provider profile to user edit page.
+ */
+function artesis_user_frontend_form_user_profile_form_alter(&$form, &$form_state) {
+  $profile = ding_user_provider_profile($form['#user']);
+
+  if ($profile) {
+    $form_state['profiles'][$profile->type] = $profile;
+    profile2_attach_form($form, $form_state);
+    $form['profile_' . $profile->type]['#type'] = 'fieldset';
+    $form['profile_' . $profile->type]['#title'] = t('My library');
+  }
+}
+
+/**
+ * Implements hook_user_view_alter().
+ *
+ * Fix the title of the profile2 provider profile and hide Drupal standard
+ * summary ("Member for", etc).
+ */
+function artesis_user_frontend_user_view_alter(&$build) {
+  foreach ($build as $name => $val) {
+    // This will look odd if multiple provider profiles are active, but that
+    // shouldn't happen.
+    if (preg_match('/^profile_provider_/', $name)) {
+      $build[$name]['#title'] = t('My library');
+    }
+  }
+  $build['summary']['#access'] = FALSE;
+}
